@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.interfaces.DecodedJWT;
 
 public class TokenValidator {
 
@@ -33,4 +34,15 @@ public class TokenValidator {
         }
     }
 
+    public String getEmailFromToken(String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            throw new IllegalArgumentException("Invalid Authorization header");
+        }
+
+        String token = authHeader.substring(7); // remove "Bearer "
+        DecodedJWT jwt = JWT.decode(token);
+
+        // Aqui assumimos que o e-mail está no claim "email"
+        return jwt.getClaim("email").asString();
+    }
 }

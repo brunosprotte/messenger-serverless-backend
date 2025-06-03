@@ -6,6 +6,7 @@ Use `./build-lambda.sh com.messenger.handler.usuarios.UsuarioCreateHandler usuar
 cd scripts
 
 ./build-lambda.sh com.messenger.handler.usuarios.UsuarioCreateHandler usuario-create
+./build-lambda.sh com.messenger.handler.contatos.ContatoCreateHandler contato-create
 ./build-lambda.sh com.messenger.handler.auth.AuthHandler auth
 ```
 
@@ -13,6 +14,7 @@ cd scripts
 ```
 cd scripts/
 ./deploy-lambda.sh com.messenger.handler.usuarios.UsuarioCreateHandler usuario-create
+./deploy-lambda.sh com.messenger.handler.contatos.ContatoCreateHandler contato-create
 ./deploy-lambda.sh com.messenger.handler.usuarios.AuthHandler auth
 ```
 

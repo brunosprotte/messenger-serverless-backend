@@ -52,6 +52,12 @@ resource "aws_api_gateway_resource" "usuarios_resource" {
   path_part   = "usuarios"
 }
 
+resource "aws_api_gateway_resource" "contatos_resource" {
+  rest_api_id = aws_api_gateway_rest_api.api.id
+  parent_id   = aws_api_gateway_rest_api.api.root_resource_id
+  path_part   = "contatos"
+}
+
 resource "aws_api_gateway_resource" "lambda_resource" {
   rest_api_id = aws_api_gateway_rest_api.api.id
   parent_id   = aws_api_gateway_rest_api.api.root_resource_id
@@ -61,6 +67,13 @@ resource "aws_api_gateway_resource" "lambda_resource" {
 resource "aws_api_gateway_method" "usuarios_post_method" {
   rest_api_id   = aws_api_gateway_rest_api.api.id
   resource_id   = aws_api_gateway_resource.usuarios_resource.id
+  http_method   = "POST"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_method" "contatos_post_method" {
+  rest_api_id   = aws_api_gateway_rest_api.api.id
+  resource_id   = aws_api_gateway_resource.contatos_resource.id
   http_method   = "POST"
   authorization = "NONE"
 }
@@ -81,6 +94,15 @@ resource "aws_api_gateway_integration" "usuarios_lambda_integration" {
   uri                     = module.usuario_create_lambda.invoke_arn
 }
 
+resource "aws_api_gateway_integration" "contatos_lambda_integration" {
+  rest_api_id             = aws_api_gateway_rest_api.api.id
+  resource_id             = aws_api_gateway_resource.contatos_resource.id
+  http_method             = aws_api_gateway_method.contatos_post_method.http_method
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = module.contato_create_lambda.invoke_arn
+}
+
 resource "aws_api_gateway_integration" "lambda_integration" {
   rest_api_id             = aws_api_gateway_rest_api.api.id
   resource_id             = aws_api_gateway_resource.lambda_resource.id
@@ -94,6 +116,14 @@ resource "aws_lambda_permission" "usuarios_apigw_lambda" {
   statement_id  = "AllowAPIGatewayInvokeUsuarios"
   action        = "lambda:InvokeFunction"
   function_name = module.usuario_create_lambda.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.api.execution_arn}/*/*"
+}
+
+resource "aws_lambda_permission" "contatos_apigw_lambda" {
+  statement_id  = "AllowAPIGatewayInvokeContatos"
+  action        = "lambda:InvokeFunction"
+  function_name = module.contato_create_lambda.function_name
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_api_gateway_rest_api.api.execution_arn}/*/*"
 }
@@ -134,7 +164,10 @@ resource "aws_iam_policy" "dynamodb_access" {
           "dynamodb:Query"
         ],
         Effect   = "Allow",
-        Resource = aws_dynamodb_table.usuarios.arn
+        Resource = [
+          aws_dynamodb_table.usuarios.arn,
+          aws_dynamodb_table.contatos.arn
+        ]
       }
     ]
   })
@@ -152,6 +185,23 @@ resource "aws_dynamodb_table" "usuarios" {
 
   attribute {
     name = "id"
+    type = "S"
+  }
+}
+
+resource "aws_dynamodb_table" "contatos" {
+  name         = "contatos"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "usuario_email"
+  range_key    = "contato_email"
+
+  attribute {
+    name = "usuario_email"
+    type = "S"
+  }
+
+  attribute {
+    name = "contato_email"
     type = "S"
   }
 }
