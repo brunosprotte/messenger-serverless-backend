@@ -21,3 +21,11 @@ module "contato_create_lambda" {
   handler     = "com.messenger.handler.contatos.ContatoCreateHandler::handleRequest"
   role_arn    = aws_iam_role.lambda_exec.arn
 }
+
+module "contato_bloqueio_lambda" {
+  source      = "./modules/lambda"
+  lambda_name = "contato-bloqueio"
+  lambda_file = "contato-bloqueio.jar"
+  handler     = "com.messenger.handler.contatos.ContatoBloqueioHandler::handleRequest"
+  role_arn    = aws_iam_role.lambda_exec.arn
+}
