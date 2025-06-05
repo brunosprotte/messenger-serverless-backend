@@ -14,6 +14,14 @@ module "usuario_create_lambda" {
   role_arn     = aws_iam_role.lambda_exec.arn
 }
 
+module "foto_upload_lambda" {
+  source      = "./modules/lambda"
+  lambda_name = "foto-upload"
+  lambda_file = "foto-upload.jar"        # Ajuste para o seu JAR
+  handler     = "com.messenger.handler.usuarios.FotoUploadHandler::handleRequest"  # Ajuste para o seu handler
+  role_arn    = aws_iam_role.lambda_exec.arn
+}
+
 module "contato_create_lambda" {
   source      = "./modules/lambda"
   lambda_name = "contato-create"

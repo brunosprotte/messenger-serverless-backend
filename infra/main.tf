@@ -20,6 +20,7 @@ provider "aws" {
     apigateway = "http://localhost:4566"
     iam        = "http://localhost:4566"
     dynamodb   = "http://localhost:4566"
+    s3         = "http://localhost:4566"
   }
 }
 
@@ -52,6 +53,12 @@ resource "aws_api_gateway_resource" "usuarios_resource" {
   path_part   = "usuarios"
 }
 
+resource "aws_api_gateway_resource" "fotos_resource" {
+  rest_api_id = aws_api_gateway_rest_api.api.id
+  parent_id   = aws_api_gateway_rest_api.api.root_resource_id
+  path_part   = "fotos"
+}
+
 resource "aws_api_gateway_resource" "contatos_resource" {
   rest_api_id = aws_api_gateway_rest_api.api.id
   parent_id   = aws_api_gateway_rest_api.api.root_resource_id
@@ -73,6 +80,13 @@ resource "aws_api_gateway_resource" "lambda_resource" {
 resource "aws_api_gateway_method" "usuarios_post_method" {
   rest_api_id   = aws_api_gateway_rest_api.api.id
   resource_id   = aws_api_gateway_resource.usuarios_resource.id
+  http_method   = "POST"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_method" "fotos_post_method" {
+  rest_api_id   = aws_api_gateway_rest_api.api.id
+  resource_id   = aws_api_gateway_resource.fotos_resource.id
   http_method   = "POST"
   authorization = "NONE"
 }
@@ -105,6 +119,15 @@ resource "aws_api_gateway_integration" "usuarios_lambda_integration" {
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
   uri                     = module.usuario_create_lambda.invoke_arn
+}
+
+resource "aws_api_gateway_integration" "fotos_lambda_integration" {
+  rest_api_id             = aws_api_gateway_rest_api.api.id
+  resource_id             = aws_api_gateway_resource.fotos_resource.id
+  http_method             = aws_api_gateway_method.fotos_post_method.http_method
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = module.foto_upload_lambda.invoke_arn
 }
 
 resource "aws_api_gateway_integration" "contatos_lambda_integration" {
@@ -142,6 +165,14 @@ resource "aws_lambda_permission" "usuarios_apigw_lambda" {
   source_arn    = "${aws_api_gateway_rest_api.api.execution_arn}/*/*"
 }
 
+resource "aws_lambda_permission" "fotos_apigw_lambda" {
+  statement_id  = "AllowAPIGatewayInvokeFotos"
+  action        = "lambda:InvokeFunction"
+  function_name = module.foto_upload_lambda.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.api.execution_arn}/*/*"
+}
+
 resource "aws_lambda_permission" "contatos_apigw_lambda" {
   statement_id  = "AllowAPIGatewayInvokeContatos"
   action        = "lambda:InvokeFunction"
@@ -169,6 +200,7 @@ resource "aws_lambda_permission" "apigw_lambda" {
 resource "aws_api_gateway_deployment" "deployment" {
   depends_on = [
     aws_api_gateway_integration.usuarios_lambda_integration,
+    aws_api_gateway_integration.fotos_lambda_integration,
     aws_api_gateway_integration.contatos_lambda_integration,
     aws_api_gateway_integration.contatos_bloqueio_lambda_integration,
     aws_api_gateway_integration.lambda_integration
@@ -236,4 +268,34 @@ resource "aws_dynamodb_table" "contatos" {
     name = "contato_email"
     type = "S"
   }
+}
+
+// S3 Bucket
+
+resource "aws_iam_policy" "s3_access" {
+  name = "s3_access_policy"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Action = [
+          "s3:PutObject",
+          "s3:GetObject",
+          "s3:DeleteObject"
+        ],
+        Effect   = "Allow",
+        Resource = "arn:aws:s3:::fotos-perfil/*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_s3" {
+  role       = aws_iam_role.lambda_exec.name
+  policy_arn = aws_iam_policy.s3_access.arn
+}
+
+resource "aws_s3_bucket" "fotos_perfil" {
+  bucket = "fotos-perfil"
 }

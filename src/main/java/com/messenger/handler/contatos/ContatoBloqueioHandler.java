@@ -62,7 +62,6 @@ public class ContatoBloqueioHandler implements RequestHandler<APIGatewayProxyReq
                 return buildResponse(404, "Contato não encontrado");
             }
 
-
             // Atualiza o campo bloqueado
             UpdateItemRequest updateRequest = UpdateItemRequest.builder()
                     .tableName(TABELA)

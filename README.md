@@ -16,6 +16,7 @@ cd scripts
 cd scripts/
 ./deploy-lambda.sh com.messenger.handler.usuarios.AuthHandler auth
 ./deploy-lambda.sh com.messenger.handler.usuarios.UsuarioCreateHandler usuario-create
+./deploy-lambda.sh com.messenger.handler.usuarios.FotoUploadHandler foto-upload
 ./deploy-lambda.sh com.messenger.handler.contatos.ContatoCreateHandler contato-create
 ./deploy-lambda.sh com.messenger.handler.contatos.ContatoBloqueioHandler contato-bloqueio
 ```
