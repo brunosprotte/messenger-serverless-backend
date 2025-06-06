@@ -56,6 +56,7 @@ public class UsuarioCreateHandler implements RequestHandler<APIGatewayProxyReque
             return buildResponse(201, "Usuário cadastrado com sucesso");
 
         } catch (Exception e) {
+            System.out.println("ERROR: " + e.getMessage());
             return buildResponse(400, "Erro ao processar requisição: " + e.getMessage());
         }
     }

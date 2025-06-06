@@ -30,6 +30,7 @@ public class FotoUploadHandler implements RequestHandler<APIGatewayProxyRequestE
     private static final S3Client s3 = S3Client.builder()
             .endpointOverride(URI.create("http://host.docker.internal:4566"))
             .region(Region.US_EAST_1)
+            .forcePathStyle(true)
             .httpClientBuilder(UrlConnectionHttpClient.builder())
             .build();
 
@@ -38,12 +39,12 @@ public class FotoUploadHandler implements RequestHandler<APIGatewayProxyRequestE
             .region(Region.US_EAST_1)
             .build();
 
-    private static final String BUCKET = "messenger-fotos";
+    private static final String BUCKET = "fotos-perfil";
     private static final String TABELA = "usuarios";
 
     @Override
     public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent request, Context context) {
-
+        System.out.println("APIGatewayProxyResponseEvent...");
         String authHeader = Optional.ofNullable(request.getHeaders()).map(h -> h.get("Authorization")).orElse(null);
 
         if (!tokenValidator.isTokenValid(authHeader)) {
@@ -113,6 +114,7 @@ public class FotoUploadHandler implements RequestHandler<APIGatewayProxyRequestE
             return buildResponse(200, "Foto de perfil atualizada com sucesso");
 
         } catch (Exception e) {
+            System.out.println("ERROR: " + e.getMessage());
             e.printStackTrace();
             return buildResponse(500, "Erro ao processar upload: " + e.getMessage());
         }

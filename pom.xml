@@ -13,20 +13,29 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <aws.sdk.version>2.25.0</aws.sdk.version>
+
         <lambda.finalName>${env.LAMBDA_NAME}</lambda.finalName>
     </properties>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>software.amazon.awssdk</groupId>
+                <artifactId>bom</artifactId>
+                <version>${aws.sdk.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
-        <dependency>
-            <groupId>software.amazon.awssdk</groupId>
-            <artifactId>sdk-core</artifactId>
-            <version>2.31.57</version> <!-- mesma do s3 -->
-        </dependency>
 
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>url-connection-client</artifactId>
-            <version>2.31.57</version> <!-- Mesma versão do restante do SDK -->
         </dependency>
 
         <!-- AWS Lambda Core -->
@@ -39,14 +48,12 @@
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>dynamodb</artifactId>
-            <version>2.25.0</version> <!-- ou mais recente -->
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/software.amazon.awssdk/s3 -->
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>s3</artifactId>
-            <version>2.31.57</version>
         </dependency>
 
         <!-- AWS Events (opcional, se usar APIGatewayProxyRequestEvent) -->
