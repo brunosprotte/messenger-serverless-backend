@@ -30,10 +30,18 @@ module "contato_create_lambda" {
   role_arn    = aws_iam_role.lambda_exec.arn
 }
 
-module "contato_bloqueio_lambda" {
+module "contato_update_lambda" {
   source      = "./modules/lambda"
-  lambda_name = "contato-bloqueio"
-  lambda_file = "contato-bloqueio.jar"
-  handler     = "com.messenger.handler.contatos.ContatoBloqueioHandler::handleRequest"
+  lambda_name = "contato-update"
+  lambda_file = "contato-update.jar"
+  handler     = "com.messenger.handler.contatos.ContatoAceitarHandler::handleRequest"
+  role_arn    = aws_iam_role.lambda_exec.arn
+}
+
+module "contato_delete_lambda" {
+  source      = "./modules/lambda"
+  lambda_name = "contato-delete"
+  lambda_file = "contato-delete.jar"
+  handler     = "com.messenger.handler.contatos.ContatoDeleteHandler::handleRequest"
   role_arn    = aws_iam_role.lambda_exec.arn
 }

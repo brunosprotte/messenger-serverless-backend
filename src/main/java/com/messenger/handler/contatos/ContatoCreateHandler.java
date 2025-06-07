@@ -38,18 +38,19 @@ public class ContatoCreateHandler implements RequestHandler<APIGatewayProxyReque
     public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent req, Context context) {
         try {
             // Validação do token
-            String authHeader = Optional.ofNullable(req.getHeaders()).map(h -> h.get("Authorization")).orElse(null);
-            if (authHeader == null || !tokenValidator.isTokenValid(authHeader)) {
+            String authHeader = req.getHeaders() != null ? req.getHeaders().get("Authorization") : null;
+
+            if (!tokenValidator.isTokenValid(authHeader)) {
                 return buildResponse(401, "Token inválido ou ausente");
             }
 
-            String usuarioId = tokenValidator.getEmailFromToken(authHeader);
+            String usuarioEmail = tokenValidator.getEmailFromToken(authHeader);
 
             // Parse do body
             JsonNode body = mapper.readTree(req.getBody());
-            String contatoEmail = body.get("email").asText();
+            String contatoEmail = body.get("contatoEmail").asText();
 
-//            if (usuarioId.equalsIgnoreCase(contatoEmail)) {
+//            if (usuarioEmail.equalsIgnoreCase(contatoEmail)) {
 //                return buildResponse(400, "Não é possível adicionar você mesmo como contato");
 //            }
 
@@ -59,12 +60,12 @@ public class ContatoCreateHandler implements RequestHandler<APIGatewayProxyReque
             }
 
             // Verifica duplicidade
-            if (contatoJaExiste(usuarioId, contatoEmail)) {
+            if (contatoJaExiste(usuarioEmail, contatoEmail)) {
                 return buildResponse(409, "Contato já adicionado");
             }
 
             // Salva o contato
-            salvarContato(usuarioId, contatoEmail);
+            salvarContato(usuarioEmail, contatoEmail);
             return buildResponse(201, "Contato adicionado com sucesso");
 
         } catch (Exception e) {
@@ -79,9 +80,9 @@ public class ContatoCreateHandler implements RequestHandler<APIGatewayProxyReque
         return dynamoDb.getItem(req).hasItem();
     }
 
-    private boolean contatoJaExiste(String usuarioId, String contatoEmail) {
+    private boolean contatoJaExiste(String usuarioEmail, String contatoEmail) {
         Map<String, AttributeValue> chave = Map.of(
-                "usuario_email", AttributeValue.fromS(usuarioId),
+                "usuario_email", AttributeValue.fromS(usuarioEmail),
                 "contato_email", AttributeValue.fromS(contatoEmail)
         );
         GetItemRequest req = GetItemRequest.builder()
@@ -91,12 +92,13 @@ public class ContatoCreateHandler implements RequestHandler<APIGatewayProxyReque
         return dynamoDb.getItem(req).hasItem();
     }
 
-    private void salvarContato(String usuarioId, String contatoEmail) {
+    private void salvarContato(String usuarioEmail, String contatoEmail) {
         String createdAt = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
         Map<String, AttributeValue> item = Map.of(
-                "usuario_email", AttributeValue.fromS(usuarioId),
+                "usuario_email", AttributeValue.fromS(usuarioEmail),
                 "contato_email", AttributeValue.fromS(contatoEmail),
                 "bloqueado", AttributeValue.fromBool(false),
+                "aceito", AttributeValue.fromBool(false),
                 "createdAt", AttributeValue.fromS(createdAt)
         );
         PutItemRequest req = PutItemRequest.builder()

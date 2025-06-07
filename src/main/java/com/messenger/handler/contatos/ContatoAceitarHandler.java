@@ -8,27 +8,30 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.messenger.shared.auth.TokenValidator;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
-import software.amazon.awssdk.services.dynamodb.model.*;
+import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
+import software.amazon.awssdk.services.dynamodb.model.GetItemRequest;
+import software.amazon.awssdk.services.dynamodb.model.GetItemResponse;
+import software.amazon.awssdk.services.dynamodb.model.UpdateItemRequest;
 
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ContatoBloqueioHandler implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
+public class ContatoAceitarHandler implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
 
     private static final ObjectMapper mapper = new ObjectMapper();
     private static final TokenValidator tokenValidator = new TokenValidator();
     private static final DynamoDbClient dynamoDb = DynamoDbClient.builder()
-            .endpointOverride(URI.create("http://host.docker.internal:4566")) // LocalStack
+            .endpointOverride(URI.create("http://host.docker.internal:4566"))
             .region(Region.US_EAST_1)
             .build();
 
     private static final String TABELA = "contatos";
 
     @Override
-    public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent req, Context context) {
+    public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent request, Context context) {
 
-        String authHeader = req.getHeaders() != null ? req.getHeaders().get("Authorization") : null;
+        String authHeader = request.getHeaders() != null ? request.getHeaders().get("Authorization") : null;
 
         if (!tokenValidator.isTokenValid(authHeader)) {
             return buildResponse(401, "Token inválido ou ausente");
@@ -37,18 +40,19 @@ public class ContatoBloqueioHandler implements RequestHandler<APIGatewayProxyReq
         String usuarioEmail = tokenValidator.getEmailFromToken(authHeader);
 
         try {
-            Map<String, Object> bodyMap = mapper.readValue(req.getBody(), Map.class);
+            // Parse do body (esperado um JSON com "contatoEmail")
+            Map<String, Object> bodyMap = mapper.readValue(request.getBody(), Map.class);
             String contatoEmail = (String) bodyMap.get("contatoEmail");
-            Boolean bloquear = (Boolean) bodyMap.get("bloquear");
+            Boolean aceitar = (Boolean) bodyMap.get("aceitar");
 
-            if (contatoEmail == null || bloquear == null) {
-                return buildResponse(400, "Parâmetros obrigatórios: contatoEmail, bloquear");
+            if (contatoEmail == null || aceitar == null) {
+                return buildResponse(400, "Parâmetros obrigatórios: contatoEmail, aceitar");
             }
 
             // Verifica se o contato existe
             Map<String, AttributeValue> chave = new HashMap<>();
-            chave.put("usuario_email", AttributeValue.fromS(usuarioEmail));
-            chave.put("contato_email", AttributeValue.fromS(contatoEmail));
+            chave.put("usuario_email", AttributeValue.fromS(contatoEmail));
+            chave.put("contato_email", AttributeValue.fromS(usuarioEmail));
 
             GetItemRequest getRequest = GetItemRequest.builder()
                     .tableName(TABELA)
@@ -61,24 +65,22 @@ public class ContatoBloqueioHandler implements RequestHandler<APIGatewayProxyReq
                 return buildResponse(404, "Contato não encontrado");
             }
 
-            // Atualiza o campo bloqueado
+            // Atualiza o campo aceito
             UpdateItemRequest updateRequest = UpdateItemRequest.builder()
                     .tableName(TABELA)
                     .key(chave)
-                    .updateExpression("SET bloqueado = :bloqueado")
+                    .updateExpression("SET aceito = :aceito")
                     .expressionAttributeValues(Map.of(
-                            ":bloqueado", AttributeValue.fromBool(bloquear)
+                            ":aceito", AttributeValue.fromBool(aceitar)
                     ))
                     .build();
 
             dynamoDb.updateItem(updateRequest);
 
-
-            String acao = bloquear ? "bloqueado" : "desbloqueado";
-
-            return buildResponse(200, "Contato " + acao + " com sucesso");
+            return buildResponse(200, "Contato aceito com sucesso");
 
         } catch (Exception e) {
+            e.printStackTrace();
             return buildResponse(400, "Erro ao processar requisição: " + e.getMessage());
         }
     }
@@ -90,4 +92,3 @@ public class ContatoBloqueioHandler implements RequestHandler<APIGatewayProxyReq
                 .withHeaders(Map.of("Content-Type", "application/json"));
     }
 }
-

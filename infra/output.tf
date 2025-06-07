@@ -15,6 +15,9 @@ output "contatos_post_url" {
 }
 
 output "contatos_patch_url" {
-  value = "http://localhost:4566/_aws/execute-api/${aws_api_gateway_rest_api.api.id}/dev/contatos/bloqueio"
+  value = "http://localhost:4566/_aws/execute-api/${aws_api_gateway_rest_api.api.id}/dev/contatos"
 }
 
+output "contatos_delete_url" {
+  value = "http://localhost:4566/_aws/execute-api/${aws_api_gateway_rest_api.api.id}/dev/contatos"
+}

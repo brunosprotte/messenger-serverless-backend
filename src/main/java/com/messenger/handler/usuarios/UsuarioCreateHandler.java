@@ -34,8 +34,6 @@ public class UsuarioCreateHandler implements RequestHandler<APIGatewayProxyReque
         Map<String, String> headers = req.getHeaders();
         String authHeader = headers != null ? headers.get("Authorization") : null;
 
-        System.out.println("token: " + authHeader);
-
         if (authHeader == null || !tokenValidator.isTokenValid(authHeader)) {
             System.out.println("Token inválido ou ausente");
             return buildResponse(401, "Token inválido ou ausente");
