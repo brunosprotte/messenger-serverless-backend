@@ -34,7 +34,7 @@ module "contato_update_lambda" {
   source      = "./modules/lambda"
   lambda_name = "contato-update"
   lambda_file = "contato-update.jar"
-  handler     = "com.messenger.handler.contatos.ContatoAceitarHandler::handleRequest"
+  handler     = "com.messenger.handler.contatos.ContatoUpdateHandler::handleRequest"
   role_arn    = aws_iam_role.lambda_exec.arn
 }
 

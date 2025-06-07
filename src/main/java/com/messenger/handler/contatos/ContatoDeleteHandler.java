@@ -15,6 +15,7 @@ import software.amazon.awssdk.services.dynamodb.model.GetItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.GetItemResponse;
 
 import java.net.URI;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -38,34 +39,37 @@ public class ContatoDeleteHandler implements RequestHandler<APIGatewayProxyReque
             return buildResponse(401, "Token inválido ou ausente");
         }
 
-        String usuarioEmail = tokenValidator.getEmailFromToken(authHeader);
+        String usuarioLogado = tokenValidator.getEmailFromToken(authHeader);
 
         try {
             JsonNode body = objectMapper.readTree(request.getBody());
+            String usuarioEmail = body.get("usuarioEmail").asText();
             String contatoEmail = body.get("contatoEmail").asText();
 
+            if (!usuarioLogado.equalsIgnoreCase(usuarioEmail) && !usuarioLogado.equalsIgnoreCase(contatoEmail)) {
+                return buildResponse(400, "Requisição inválida: o usuário só pode alterar dados do contato se fizer parte do contato.");
+            }
+
+            Map<String, AttributeValue> chave = new HashMap<>();
+            chave.put("usuario_email", AttributeValue.fromS(usuarioEmail));
+            chave.put("contato_email", AttributeValue.fromS(contatoEmail));
+
             // Verifica se o contato existe
-            GetItemRequest getReq = GetItemRequest.builder()
+            GetItemRequest getRequest = GetItemRequest.builder()
                     .tableName(TABELA)
-                    .key(Map.of(
-                            "usuario_email", AttributeValue.fromS(usuarioEmail),
-                            "contato_email", AttributeValue.fromS(contatoEmail)
-                    ))
+                    .key(chave)
                     .build();
 
-            GetItemResponse getResp = dynamoDb.getItem(getReq);
+            GetItemResponse getResponse = dynamoDb.getItem(getRequest);
 
-            if (!getResp.hasItem()) {
+            if (!getResponse.hasItem()) {
                 return buildResponse(404, "Contato não encontrado");
             }
 
             // Deleta o contato
             DeleteItemRequest deleteReq = DeleteItemRequest.builder()
                     .tableName(TABELA)
-                    .key(Map.of(
-                            "usuario_email", AttributeValue.fromS(usuarioEmail),
-                            "contato_email", AttributeValue.fromS(contatoEmail)
-                    ))
+                    .key(chave)
                     .build();
 
             dynamoDb.deleteItem(deleteReq);

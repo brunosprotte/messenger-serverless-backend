@@ -39,32 +39,28 @@ public class ContatoUpdateHandler implements RequestHandler<APIGatewayProxyReque
             return buildResponse(401, "Token inválido ou ausente");
         }
 
-        String emailUsuario = tokenValidator.getEmailFromToken(authHeader);
+        String usuarioLogado = tokenValidator.getEmailFromToken(authHeader);
 
         try {
+
             JsonNode body = objectMapper.readTree(request.getBody());
-            String emailContato = body.get("contatoEmail").asText();
+            String usuarioEmail = body.get("usuarioEmail").asText();
+            String contatoEmail = body.get("contatoEmail").asText();
 
-            boolean hasAceitar = body.has("aceitar");
-            boolean hasBloquear = body.has("bloquear");
+            boolean hasAceito = body.has("aceito");
+            boolean hasBloqueado = body.has("bloqueado");
 
-            if (!hasAceitar && !hasBloquear) {
-                return buildResponse(400, "Requisição inválida: informe pelo menos um dos campos 'aceitar' ou 'bloquear'");
+            if (!usuarioLogado.equalsIgnoreCase(usuarioEmail) && !usuarioLogado.equalsIgnoreCase(contatoEmail)) {
+                return buildResponse(400, "Requisição inválida: o usuário só pode alterar dados do contato se fizer parte do contato.");
             }
 
-            /* Caso seja um PATCH para aceitar um contato, é necessário inverter os campos usuario_email e contato_email
-             * Explicação
-             * usuario_email adiciona um contato_email
-             * contato_email aceita um usuario_email
-             */
+            if (usuarioEmail.isEmpty() || contatoEmail.isEmpty() || (!hasAceito && !hasBloqueado)) {
+                return buildResponse(400, "Requisição inválida: informe usuarioEmail, contatoEmail e pelo menos um dos campos 'aceitar' ou 'bloquear'");
+            }
+
             Map<String, AttributeValue> chave = new HashMap<>();
-            if (hasAceitar) {
-                chave.put("usuario_email", AttributeValue.fromS(emailContato));
-                chave.put("contato_email", AttributeValue.fromS(emailUsuario));
-            } else {
-                chave.put("usuario_email", AttributeValue.fromS(emailUsuario));
-                chave.put("contato_email", AttributeValue.fromS(emailContato));
-            }
+            chave.put("usuario_email", AttributeValue.fromS(usuarioEmail));
+            chave.put("contato_email", AttributeValue.fromS(contatoEmail));
 
             // Verifica se o contato existe
             GetItemRequest getRequest = GetItemRequest.builder()
@@ -82,13 +78,13 @@ public class ContatoUpdateHandler implements RequestHandler<APIGatewayProxyReque
             StringBuilder updateExpression = new StringBuilder("SET ");
             Map<String, AttributeValue> expressionValues = new HashMap<>();
 
-            if (hasAceitar) {
+            if (hasAceito) {
                 updateExpression.append("aceito = :aceito");
                 expressionValues.put(":aceito", AttributeValue.fromBool(body.get("aceito").asBoolean()));
             }
 
-            if (hasBloquear) {
-                if (hasAceitar) {
+            if (hasBloqueado) {
+                if (hasAceito) {
                     updateExpression.append(", ");
                 }
                 updateExpression.append("bloqueado = :bloqueado");
