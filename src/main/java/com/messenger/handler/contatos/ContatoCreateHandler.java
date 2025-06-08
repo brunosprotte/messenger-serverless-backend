@@ -7,8 +7,6 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.messenger.shared.auth.TokenValidator;
-import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
-import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
@@ -19,7 +17,6 @@ import java.net.URI;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
-import java.util.Optional;
 
 public class ContatoCreateHandler implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
 
@@ -28,7 +25,6 @@ public class ContatoCreateHandler implements RequestHandler<APIGatewayProxyReque
     private static final DynamoDbClient dynamoDb = DynamoDbClient.builder()
             .endpointOverride(URI.create("http://host.docker.internal:4566")) // LocalStack
             .region(Region.US_EAST_1)
-         //   .credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create("test", "test")))
             .build();
 
     private static final String TABELA_USUARIOS = "usuarios";

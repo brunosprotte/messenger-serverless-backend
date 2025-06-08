@@ -46,8 +46,8 @@ public class ContatoDeleteHandler implements RequestHandler<APIGatewayProxyReque
             String usuarioEmail = body.get("usuarioEmail").asText();
             String contatoEmail = body.get("contatoEmail").asText();
 
-            if (!usuarioLogado.equalsIgnoreCase(usuarioEmail) && !usuarioLogado.equalsIgnoreCase(contatoEmail)) {
-                return buildResponse(400, "Requisição inválida: o usuário só pode alterar dados do contato se fizer parte do contato.");
+            if (!usuarioLogado.equalsIgnoreCase(usuarioEmail)) {
+                return buildResponse(403, "Você não tem permissão para atualizar este contato.");
             }
 
             Map<String, AttributeValue> chave = new HashMap<>();

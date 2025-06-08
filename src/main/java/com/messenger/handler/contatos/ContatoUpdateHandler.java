@@ -9,12 +9,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.messenger.shared.auth.TokenValidator;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
-import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
-import software.amazon.awssdk.services.dynamodb.model.GetItemRequest;
-import software.amazon.awssdk.services.dynamodb.model.GetItemResponse;
-import software.amazon.awssdk.services.dynamodb.model.UpdateItemRequest;
+import software.amazon.awssdk.services.dynamodb.model.*;
 
 import java.net.URI;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -42,7 +41,6 @@ public class ContatoUpdateHandler implements RequestHandler<APIGatewayProxyReque
         String usuarioLogado = tokenValidator.getEmailFromToken(authHeader);
 
         try {
-
             JsonNode body = objectMapper.readTree(request.getBody());
             String usuarioEmail = body.get("usuarioEmail").asText();
             String contatoEmail = body.get("contatoEmail").asText();
@@ -50,12 +48,12 @@ public class ContatoUpdateHandler implements RequestHandler<APIGatewayProxyReque
             boolean hasAceito = body.has("aceito");
             boolean hasBloqueado = body.has("bloqueado");
 
-            if (!usuarioLogado.equalsIgnoreCase(usuarioEmail) && !usuarioLogado.equalsIgnoreCase(contatoEmail)) {
-                return buildResponse(400, "Requisição inválida: o usuário só pode alterar dados do contato se fizer parte do contato.");
+            if (!usuarioLogado.equalsIgnoreCase(usuarioEmail)) {
+                return buildResponse(403, "Você não tem permissão para atualizar este contato.");
             }
 
             if (usuarioEmail.isEmpty() || contatoEmail.isEmpty() || (!hasAceito && !hasBloqueado)) {
-                return buildResponse(400, "Requisição inválida: informe usuarioEmail, contatoEmail e pelo menos um dos campos 'aceitar' ou 'bloquear'");
+                return buildResponse(400, "Requisição inválida: informe usuarioEmail, contatoEmail e pelo menos um dos campos 'aceito' ou 'bloqueado'");
             }
 
             Map<String, AttributeValue> chave = new HashMap<>();
@@ -91,6 +89,7 @@ public class ContatoUpdateHandler implements RequestHandler<APIGatewayProxyReque
                 expressionValues.put(":bloqueado", AttributeValue.fromBool(body.get("bloqueado").asBoolean()));
             }
 
+            // Atualiza o contato
             UpdateItemRequest updateReq = UpdateItemRequest.builder()
                     .tableName(TABELA)
                     .key(chave)
@@ -100,11 +99,51 @@ public class ContatoUpdateHandler implements RequestHandler<APIGatewayProxyReque
 
             dynamoDb.updateItem(updateReq);
 
+            // Se aceitou, criar reciprocidade caso não exista
+            if (hasAceito && body.get("aceito").asBoolean()) {
+                criarContatoReciprocoSeNecessario(usuarioEmail, contatoEmail);
+            }
+
             return buildResponse(200, "Contato atualizado com sucesso");
 
         } catch (Exception e) {
             e.printStackTrace();
             return buildResponse(500, "Erro ao atualizar contato: " + e.getMessage());
+        }
+    }
+
+    private void criarContatoReciprocoSeNecessario(String usuarioEmail, String contatoEmail) {
+        Map<String, AttributeValue> chaveReciproco = Map.of(
+                "usuario_email", AttributeValue.fromS(contatoEmail),
+                "contato_email", AttributeValue.fromS(usuarioEmail)
+        );
+
+        GetItemRequest getRequestReciproco = GetItemRequest.builder()
+                .tableName(TABELA)
+                .key(chaveReciproco)
+                .build();
+
+        GetItemResponse getResponseReciproco = dynamoDb.getItem(getRequestReciproco);
+
+        if (!getResponseReciproco.hasItem()) {
+            System.out.printf("Criando reciprocidade %s -> %s%n", contatoEmail, usuarioEmail);
+
+            String createdAt = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
+
+            Map<String, AttributeValue> itemReciproco = Map.of(
+                    "usuario_email", AttributeValue.fromS(contatoEmail),
+                    "contato_email", AttributeValue.fromS(usuarioEmail),
+                    "bloqueado", AttributeValue.fromBool(false),
+                    "aceito", AttributeValue.fromBool(true),
+                    "createdAt", AttributeValue.fromS(createdAt)
+            );
+
+            PutItemRequest putReq = PutItemRequest.builder()
+                    .tableName(TABELA)
+                    .item(itemReciproco)
+                    .build();
+
+            dynamoDb.putItem(putReq);
         }
     }
 
