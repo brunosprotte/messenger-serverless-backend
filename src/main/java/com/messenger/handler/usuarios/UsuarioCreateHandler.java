@@ -31,13 +31,13 @@ public class UsuarioCreateHandler implements RequestHandler<APIGatewayProxyReque
     @Override
     public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent req, Context context) {
 
-        Map<String, String> headers = req.getHeaders();
-        String authHeader = headers != null ? headers.get("Authorization") : null;
+//        Map<String, String> headers = req.getHeaders();
+//        String authHeader = headers != null ? headers.get("Authorization") : null;
 
-        if (authHeader == null || !tokenValidator.isTokenValid(authHeader)) {
-            System.out.println("Token inválido ou ausente");
-            return buildResponse(401, "Token inválido ou ausente");
-        }
+//        if (authHeader == null || !tokenValidator.isTokenValid(authHeader)) {
+//            System.out.println("Token inválido ou ausente");
+//            return buildResponse(401, "Token inválido ou ausente");
+//        }
 
         try {
             Usuario usuario = mapper.readValue(req.getBody(), Usuario.class);
