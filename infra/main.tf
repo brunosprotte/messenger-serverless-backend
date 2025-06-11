@@ -289,6 +289,23 @@ resource "aws_dynamodb_table" "contatos" {
   }
 }
 
+resource "aws_dynamodb_table" "mensagens_pendentes" {
+  name         = "mensagens_pendentes"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "destinatario_email"
+  range_key    = "timestamp"
+
+  attribute {
+    name = "destinatario_email"
+    type = "S"
+  }
+
+  attribute {
+    name = "timestamp"
+    type = "S"
+  }
+}
+
 // S3 Bucket
 
 resource "aws_iam_policy" "s3_access" {
