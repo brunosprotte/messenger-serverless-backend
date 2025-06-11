@@ -20,7 +20,7 @@ import java.util.Map;
 public class UsuarioCreateHandler implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
 
     private static final ObjectMapper mapper = new ObjectMapper();
-    private static final TokenValidator tokenValidator = new TokenValidator();
+//    private static final TokenValidator tokenValidator = new TokenValidator();
     private static final DynamoDbClient dynamoDb = DynamoDbClient.builder()
             .endpointOverride(URI.create("http://host.docker.internal:4566"))
             .region(Region.US_EAST_1)

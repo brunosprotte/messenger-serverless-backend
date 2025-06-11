@@ -48,7 +48,7 @@ public class ContatoUpdateHandler implements RequestHandler<APIGatewayProxyReque
             boolean hasAceito = body.has("aceito");
             boolean hasBloqueado = body.has("bloqueado");
 
-            if (!usuarioLogado.equalsIgnoreCase(usuarioEmail)) {
+            if (!usuarioLogado.equalsIgnoreCase(usuarioEmail) && hasBloqueado) {
                 return buildResponse(403, "Você não tem permissão para atualizar este contato.");
             }
 
