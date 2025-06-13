@@ -270,6 +270,12 @@ resource "aws_dynamodb_table" "usuarios" {
     name = "id"
     type = "S"
   }
+
+  global_secondary_index {
+    name               = "email-index"
+    hash_key           = "email"
+    projection_type    = "ALL"
+  }
 }
 
 resource "aws_dynamodb_table" "contatos" {
