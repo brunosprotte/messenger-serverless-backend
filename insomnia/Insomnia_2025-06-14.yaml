@@ -1,0 +1,339 @@
+type: collection.insomnia.rest/5.0
+name: Scratch Pad
+meta:
+  id: wrk_scratchpad
+  created: 1741815206363
+  modified: 1741815206363
+collection:
+  - name: MSN Messenger
+    meta:
+      id: fld_a89f1af3035f489ca7c452f35fe19bc8
+      created: 1748990847344
+      modified: 1748990847344
+      sortKey: -1748990847344
+    children:
+      - name: Lambda API
+        meta:
+          id: fld_b9c398c79e664824a812bf09f56265fe
+          created: 1749595640647
+          modified: 1749595677948
+          sortKey: -1749595659513
+        children:
+          - name: contatos
+            meta:
+              id: fld_a2b22234ccb447578865228e2b0a8994
+              created: 1748990987007
+              modified: 1749595655737
+              sortKey: -1749595652773
+            children:
+              - url: http://localhost:4566/_aws/execute-api/nyuc9ek9ei/dev/contatos
+                name: Create Contato
+                meta:
+                  id: req_531de4c93cdc4291ac88fa6fbecd0d5a
+                  created: 1748990250747
+                  modified: 1749912188920
+                  isPrivate: false
+                  sortKey: -1748990995488
+                method: POST
+                body:
+                  mimeType: application/json
+                  text: |-
+                    {
+                    	"contatoEmail": "mococa@email.com"
+                    }
+                headers:
+                  - name: Content-Type
+                    value: application/json
+                    id: pair_848d66ede889485cae96464b24892be0
+                  - name: User-Agent
+                    value: insomnia/11.1.0
+                    id: pair_ff5f35a7ebf142c3989f13086dafae4f
+                authentication:
+                  type: bearer
+                  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c3VhcmlvMTIzIiwibmFtZSI6ImJydW5vIiwiZW1haWwiOiJicnVub0BlbWFpbC5jb20iLCJpYXQiOjE3NDk5MTIxODMsImV4cCI6MTc0OTkxNTc4MywiaXNzIjoibG9jYWwtYXV0aDAifQ.68EBNnuUgMqYyXIe0GDJ88O8PqeLp4FWhOmFJ4prnN8
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+              - url: http://localhost:4566/_aws/execute-api/nyuc9ek9ei/dev/contatos/
+                name: Patch Contato
+                meta:
+                  id: req_83072615a44d4e3c895f08c047f2aaed
+                  created: 1749075209891
+                  modified: 1749913437472
+                  isPrivate: false
+                  sortKey: -1748990855564.5
+                method: PATCH
+                body:
+                  mimeType: application/json
+                  text: |-
+                    {
+                      "usuarioEmail": "bruno@email.com",
+                    	"contatoEmail": "mococa@email.com",
+                      "aceito": true
+                    }
+                headers:
+                  - name: Content-Type
+                    value: application/json
+                    id: pair_7235a32b7e28461c8b7e67d7e7293eaa
+                  - name: User-Agent
+                    value: insomnia/11.1.0
+                    id: pair_ff5f35a7ebf142c3989f13086dafae4f
+                authentication:
+                  type: bearer
+                  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c3VhcmlvMTIzIiwibmFtZSI6Im1vY29jYSIsImVtYWlsIjoibW9jb2NhQGVtYWlsLmNvbSIsImlhdCI6MTc0OTkxMjE4MywiZXhwIjoxNzQ5OTE1NzgzLCJpc3MiOiJsb2NhbC1hdXRoMCJ9.lDXRnFGgr_Mpo-2OSFqGpURPn0bNRRODcpkcL9jhdW4
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+              - url: http://localhost:4566/_aws/execute-api/gllu1pexip/dev/contatos/
+                name: Delete Contato
+                meta:
+                  id: req_07152b6ef13a451e871aaa4dd8b22897
+                  created: 1749314651582
+                  modified: 1749316102321
+                  isPrivate: false
+                  sortKey: -1748990785602.75
+                method: DELETE
+                body:
+                  mimeType: application/json
+                  text: |-
+                    {
+                      "usuarioEmail": "bruno@email.com",
+                    	"contatoEmail": "mococa@email.com"
+                    }
+                headers:
+                  - name: Content-Type
+                    value: application/json
+                    id: pair_7235a32b7e28461c8b7e67d7e7293eaa
+                  - name: User-Agent
+                    value: insomnia/11.1.0
+                    id: pair_ff5f35a7ebf142c3989f13086dafae4f
+                  - id: pair_f688b81a0d9f4a72a7f44e573ad15ed3
+                    name: Authorization
+                    value: Bearer
+                      eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c3VhcmlvMTIzIiwibmFtZSI6ImJydW5vIiwiZW1haWwiOiJicnVub0BlbWFpbC5jb20iLCJpYXQiOjE3NDkzMTYwOTYsImV4cCI6MTc0OTMxOTY5NiwiaXNzIjoibG9jYWwtYXV0aDAifQ.nzXXiXBCId28zjLnDgeDew2YFYK_HmHISaDQ4Hrk7S8
+                    disabled: false
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+              - url: http://localhost:4566/_aws/execute-api/nyuc9ek9ei/dev/contatos
+                name: List Contato
+                meta:
+                  id: req_55668ef9e2484166afa0e66c00b5ca15
+                  created: 1749911608476
+                  modified: 1749911821901
+                  isPrivate: false
+                  sortKey: -1748990925526.25
+                method: GET
+                headers:
+                  - name: User-Agent
+                    value: insomnia/11.1.0
+                    id: pair_ff5f35a7ebf142c3989f13086dafae4f
+                authentication:
+                  type: bearer
+                  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c3VhcmlvMTIzIiwibmFtZSI6ImJydW5vIiwiZW1haWwiOiJicnVub0BlbWFpbC5jb20iLCJpYXQiOjE3NDk5MTE3MDcsImV4cCI6MTc0OTkxNTMwNywiaXNzIjoibG9jYWwtYXV0aDAifQ.hUIxnhgi064_jYbDFHxRA3SLZxyEpjDOXPphKSl7zJE
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+          - name: usuarios
+            meta:
+              id: fld_342bbc8a8f764d6daa39408cb7baa51c
+              created: 1748991016163
+              modified: 1749595657517
+              sortKey: -1749595652873
+            children:
+              - url: http://localhost:4566/_aws/execute-api/nyuc9ek9ei/dev/usuarios
+                name: Create Usuario
+                meta:
+                  id: req_fe883b362b5a498783cbf7ac412189aa
+                  created: 1748802055101
+                  modified: 1749912203924
+                  isPrivate: false
+                  sortKey: -1748991030959
+                method: POST
+                body:
+                  mimeType: application/json
+                  text: |-
+                    {
+                    	"nome": "mococa",
+                    	"email": "mococa@email.com"
+                    }
+                headers:
+                  - name: Content-Type
+                    value: application/json
+                    id: pair_83978395de2a4c41a6ba085af5e8a2e1
+                  - name: User-Agent
+                    value: insomnia/11.1.0
+                    id: pair_0643256cba494fcc86df45491738a4a2
+                authentication:
+                  type: bearer
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+              - url: http://localhost:4566/_aws/execute-api/junzcdkzw7/dev/fotos
+                name: Create Foto
+                meta:
+                  id: req_5daca198ec194a1d9cc8bce461acb010
+                  created: 1749161544064
+                  modified: 1749164135123
+                  isPrivate: false
+                  sortKey: -1748991023611
+                method: POST
+                body:
+                  mimeType: application/octet-stream
+                  fileName: F:\Bruno\Documentos\aws\lambda-api\foto.png
+                parameters:
+                  - id: pair_721bfa97c5bc444c880024d499a8c421
+                    disabled: false
+                headers:
+                  - name: Content-Type
+                    value: multipart/form-data
+                    id: pair_cf649ecb651f4edfa72409c876cdc9b2
+                  - name: User-Agent
+                    value: insomnia/11.1.0
+                    id: pair_0643256cba494fcc86df45491738a4a2
+                  - name: Authorization
+                    value: Bearer
+                      eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c3VhcmlvMTIzIiwibmFtZSI6ImJydW5vIiwiZW1haWwiOiJicnVub0BlbWFpbC5jb20iLCJpYXQiOjE3NDkxNjE1NjQsImV4cCI6MTc0OTE2NTE2NCwiaXNzIjoibG9jYWwtYXV0aDAifQ.yKqtoFYl7DUNCIbMI4EP8NvTB4Y9R-U5BGE4ha5zE_Y
+                    id: pair_437765eb62eb416a9b4a786b0abfb6d4
+                  - id: pair_dee2fd87879a4195a2ff9feff48b76c6
+                    name: type
+                    value: image/png
+                    disabled: false
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+              - url: http://localhost:4566/_aws/execute-api/nyuc9ek9ei/dev/usuarios/
+                name: Patch Usuario
+                meta:
+                  id: req_51e6b01f51024c97a5b4ce0c1589bc36
+                  created: 1749909153683
+                  modified: 1749911794783
+                  isPrivate: false
+                  sortKey: -1748991027285
+                method: PATCH
+                body:
+                  mimeType: application/json
+                  text: |-
+                    {
+                      "nomePerfil": "bruno bruno bruno",
+                    	"frasePerfil": "frase frase frase"
+                    }
+                headers:
+                  - name: Content-Type
+                    value: application/json
+                    id: pair_7235a32b7e28461c8b7e67d7e7293eaa
+                  - name: User-Agent
+                    value: insomnia/11.1.0
+                    id: pair_ff5f35a7ebf142c3989f13086dafae4f
+                authentication:
+                  type: bearer
+                  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c3VhcmlvMTIzIiwibmFtZSI6ImJydW5vIiwiZW1haWwiOiJicnVub0BlbWFpbC5jb20iLCJpYXQiOjE3NDk5MDkyNDMsImV4cCI6MTc0OTkxMjg0MywiaXNzIjoibG9jYWwtYXV0aDAifQ.-kOBU-6hWuwJ5Go3N0aa5cxdEIsQoobRSjWWB49QRyk
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+      - name: Chat API
+        meta:
+          id: fld_83b471a8efc24438b6f80bdaeb357198
+          created: 1749595668235
+          modified: 1749595675498
+          sortKey: -1749595659413
+        children:
+          - name: New Request
+            meta:
+              id: req_3625bd624c624ebeac9688eb10f04e92
+              created: 1749595682055
+              modified: 1749595682055
+              isPrivate: false
+              sortKey: -1749595682055
+            method: GET
+            headers:
+              - name: User-Agent
+                value: insomnia/11.1.0
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: ws://localhost:8080/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c3VhcmlvMTIzIiwibmFtZSI6ImJydW5vIiwiZW1haWwiOiJicnVub0BlbWFpbC5jb20iLCJpYXQiOjE3NDk4NTM3MDYsImV4cCI6MTc0OTg1NzMwNiwiaXNzIjoibG9jYWwtYXV0aDAifQ.sduariUDeBjinmC-vDwGRc_xi-2w9KFml1bFYWXEY4M
+            name: Chat
+            meta:
+              id: ws-req_560f8bd067164c568fe1bc720e3b29e1
+              created: 1749595693936
+              modified: 1749853717667
+              sortKey: -1749595693936
+            settings:
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+            headers:
+              - name: User-Agent
+                value: insomnia/11.1.0
+          - url: ws://localhost:8080/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c3VhcmlvMTIzIiwibmFtZSI6Im1vY29jYSIsImVtYWlsIjoibW9jb2NhQGVtYWlsLmNvbSIsImlhdCI6MTc0OTg1MzcwNiwiZXhwIjoxNzQ5ODU3MzA2LCJpc3MiOiJsb2NhbC1hdXRoMCJ9.Mz8QVwRptohCNskw0RRGV1itwYJQSn9Mg5rPrOXZGww
+            name: Chat 2
+            meta:
+              id: ws-req_459945b1e3dd4d7eae411f952f119320
+              created: 1749681990767
+              modified: 1749853730785
+              sortKey: -1749595693886
+            settings:
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+            headers:
+              - name: User-Agent
+                value: insomnia/11.1.0
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_99d30891da4bdcebc63947a8fc17f076de878684
+    created: 1741815223347
+    modified: 1741815223347
+environments:
+  name: Base Environment
+  meta:
+    id: env_99d30891da4bdcebc63947a8fc17f076de878684
+    created: 1741815223289
+    modified: 1741815223289
+    isPrivate: false

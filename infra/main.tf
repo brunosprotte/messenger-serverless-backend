@@ -65,16 +65,17 @@ resource "aws_api_gateway_resource" "contatos_resource" {
   path_part   = "contatos"
 }
 
-resource "aws_api_gateway_resource" "lambda_resource" {
-  rest_api_id = aws_api_gateway_rest_api.api.id
-  parent_id   = aws_api_gateway_rest_api.api.root_resource_id
-  path_part   = "ola"
-}
-
 resource "aws_api_gateway_method" "usuarios_post_method" {
   rest_api_id   = aws_api_gateway_rest_api.api.id
   resource_id   = aws_api_gateway_resource.usuarios_resource.id
   http_method   = "POST"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_method" "usuarios_patch_method" {
+  rest_api_id   = aws_api_gateway_rest_api.api.id
+  resource_id   = aws_api_gateway_resource.usuarios_resource.id
+  http_method   = "PATCH"
   authorization = "NONE"
 }
 
@@ -92,6 +93,13 @@ resource "aws_api_gateway_method" "contatos_post_method" {
   authorization = "NONE"
 }
 
+resource "aws_api_gateway_method" "contatos_get_method" {
+  rest_api_id   = aws_api_gateway_rest_api.api.id
+  resource_id   = aws_api_gateway_resource.contatos_resource.id
+  http_method   = "GET"
+  authorization = "NONE"
+}
+
 resource "aws_api_gateway_method" "contatos_patch_method" {
   rest_api_id   = aws_api_gateway_rest_api.api.id
   resource_id   = aws_api_gateway_resource.contatos_resource.id
@@ -106,13 +114,6 @@ resource "aws_api_gateway_method" "contatos_delete_method" {
   authorization = "NONE"
 }
 
-resource "aws_api_gateway_method" "get_method" {
-  rest_api_id   = aws_api_gateway_rest_api.api.id
-  resource_id   = aws_api_gateway_resource.lambda_resource.id
-  http_method   = "GET"
-  authorization = "NONE"
-}
-
 resource "aws_api_gateway_integration" "usuarios_lambda_integration" {
   rest_api_id             = aws_api_gateway_rest_api.api.id
   resource_id             = aws_api_gateway_resource.usuarios_resource.id
@@ -120,6 +121,15 @@ resource "aws_api_gateway_integration" "usuarios_lambda_integration" {
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
   uri                     = module.usuario_create_lambda.invoke_arn
+}
+
+resource "aws_api_gateway_integration" "usuarios_patch_lambda_integration" {
+  rest_api_id             = aws_api_gateway_rest_api.api.id
+  resource_id             = aws_api_gateway_resource.usuarios_resource.id
+  http_method             = aws_api_gateway_method.usuarios_patch_method.http_method
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = module.usuario_update_lambda.invoke_arn
 }
 
 resource "aws_api_gateway_integration" "fotos_lambda_integration" {
@@ -140,6 +150,15 @@ resource "aws_api_gateway_integration" "contatos_lambda_integration" {
   uri                     = module.contato_create_lambda.invoke_arn
 }
 
+resource "aws_api_gateway_integration" "contatos_list_lambda_integration" {
+  rest_api_id             = aws_api_gateway_rest_api.api.id
+  resource_id             = aws_api_gateway_resource.contatos_resource.id
+  http_method             = aws_api_gateway_method.contatos_get_method.http_method
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = module.contato_list_lambda.invoke_arn
+}
+
 resource "aws_api_gateway_integration" "contatos_patch_lambda_integration" {
   rest_api_id             = aws_api_gateway_rest_api.api.id
   resource_id             = aws_api_gateway_resource.contatos_resource.id
@@ -158,19 +177,18 @@ resource "aws_api_gateway_integration" "contatos_delete_lambda_integration" {
   uri                     = module.contato_delete_lambda.invoke_arn
 }
 
-resource "aws_api_gateway_integration" "lambda_integration" {
-  rest_api_id             = aws_api_gateway_rest_api.api.id
-  resource_id             = aws_api_gateway_resource.lambda_resource.id
-  http_method             = aws_api_gateway_method.get_method.http_method
-  integration_http_method = "POST"
-  type                    = "AWS_PROXY"
-  uri                     = module.auth_lambda.invoke_arn
-}
-
 resource "aws_lambda_permission" "usuarios_apigw_lambda" {
   statement_id  = "AllowAPIGatewayInvokeUsuarios"
   action        = "lambda:InvokeFunction"
   function_name = module.usuario_create_lambda.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.api.execution_arn}/*/*"
+}
+
+resource "aws_lambda_permission" "usuarios_patch_apigw_lambda" {
+  statement_id  = "AllowAPIGatewayInvokeUsuarios"
+  action        = "lambda:InvokeFunction"
+  function_name = module.usuario_update_lambda.function_name
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_api_gateway_rest_api.api.execution_arn}/*/*"
 }
@@ -191,6 +209,14 @@ resource "aws_lambda_permission" "contatos_apigw_lambda" {
   source_arn    = "${aws_api_gateway_rest_api.api.execution_arn}/*/*"
 }
 
+resource "aws_lambda_permission" "contatos_get_apigw_lambda" {
+  statement_id  = "AllowAPIGatewayInvokeContatosGet"
+  action        = "lambda:InvokeFunction"
+  function_name = module.contato_list_lambda.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.api.execution_arn}/*/*"
+}
+
 resource "aws_lambda_permission" "contatos_patch_apigw_lambda" {
   statement_id  = "AllowAPIGatewayInvokeContatos"
   action        = "lambda:InvokeFunction"
@@ -207,22 +233,15 @@ resource "aws_lambda_permission" "contatos_delete_apigw_lambda" {
   source_arn    = "${aws_api_gateway_rest_api.api.execution_arn}/*/*"
 }
 
-resource "aws_lambda_permission" "apigw_lambda" {
-  statement_id  = "AllowAPIGatewayInvoke"
-  action        = "lambda:InvokeFunction"
-  function_name = module.auth_lambda.function_name
-  principal     = "apigateway.amazonaws.com"
-  source_arn    = "${aws_api_gateway_rest_api.api.execution_arn}/*/*"
-}
-
 resource "aws_api_gateway_deployment" "deployment" {
   depends_on = [
     aws_api_gateway_integration.usuarios_lambda_integration,
+    aws_api_gateway_integration.usuarios_patch_lambda_integration,
     aws_api_gateway_integration.fotos_lambda_integration,
     aws_api_gateway_integration.contatos_lambda_integration,
+    aws_api_gateway_integration.contatos_list_lambda_integration,
     aws_api_gateway_integration.contatos_patch_lambda_integration,
-    aws_api_gateway_integration.contatos_delete_lambda_integration,
-    aws_api_gateway_integration.lambda_integration
+    aws_api_gateway_integration.contatos_delete_lambda_integration
   ]
   rest_api_id = aws_api_gateway_rest_api.api.id
   stage_name  = "dev"
@@ -268,6 +287,11 @@ resource "aws_dynamodb_table" "usuarios" {
 
   attribute {
     name = "id"
+    type = "S"
+  }
+
+  attribute {
+    name = "email"
     type = "S"
   }
 

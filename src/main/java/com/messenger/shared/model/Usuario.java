@@ -6,15 +6,19 @@ public class Usuario {
     private String senha;
     private String email;
     private String fotoPerfil;
+    private String nomePerfil;
+    private String frasePerfil;
 
     public Usuario() {}
 
-    public Usuario(String id, String nome, String senha, String email, String fotoPerfil) {
+    public Usuario(String id, String nome, String senha, String email, String fotoPerfil, String nomePerfil, String frasePerfil) {
         this.id = id;
         this.nome = nome;
         this.senha = senha;
         this.email = email;
         this.fotoPerfil = fotoPerfil;
+        this.nomePerfil = nomePerfil;
+        this.frasePerfil = frasePerfil;
     }
 
     public String getId() {
@@ -55,5 +59,21 @@ public class Usuario {
 
     public void setFotoPerfil(String fotoPerfil) {
         this.fotoPerfil = fotoPerfil;
+    }
+
+    public String getNomePerfil() {
+        return nomePerfil;
+    }
+
+    public void setNomePerfil(String nomePerfil) {
+        this.nomePerfil = nomePerfil;
+    }
+
+    public String getFrasePerfil() {
+        return frasePerfil;
+    }
+
+    public void setFrasePerfil(String frasePerfil) {
+        this.frasePerfil = frasePerfil;
     }
 }
